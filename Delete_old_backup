@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function saveit() {
+             today=$(date +"%s")
+             ago=$[($today-$1)/86400]
+             if [ $ago -lt 2 ]
+             then
+                return 0
+             else
+                return 1
+             fi
+}
+#директория для архивов
+backdir=/backup2/BD_tag/
+#переходим в директорию с бэкапами
+#обходим все файлы
+cd $backdir
+for i in *
+ do
+             [ $i = "*" ] && break  #директория пуста, расходимся
+
+           #Тут требуются пояснения
+           # печатаем имя файла, а оно помните в формате YYYYMMDDbackup.tar.gz 
+           # с помощью echo
+           # c помощью cut оставляем только YYYYMMDD и вывод отправляем как параметр#
+           # команде date, которая преобразует дату в секунды.
+           # эту-то дату мы переменной fday и присвоим
+           fday=$(date -d `echo $i | cut -c 1-8` +"%s")
+# а теперь проверяем: если saveit вернула ложь — удаляем
+          #if [ saveit $fday == 1 ]
+             #then
+                 #echo 2> /home/roon/backup_test/error 2>&1
+             #fi
+
+          saveit $fday || rm -R $i
+          saveit $fday || echo "-------------" >> /backup2/Skripts_for_clear_directory/BD_tag/log
+          saveit $fday || echo "Delete_complite_"$i"_"$(date "+%d.%m.%Y") $(date "+%T" ) >> /backup2/Skripts_for_clear_directory/BD_tag/log
+          saveit $fday || echo "-------------" >> /backup2/Skripts_for_clear_directory/BD_tag/log
+done
+echo "----------------Script_complite------------------" >> /backup2/Skripts_for_clear_directory/BD_tag/log
